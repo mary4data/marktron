@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "PEEC_AI_API_KEY": "@peec_ai_api_key",
+    "TAVILY_API_KEY": "@tavily_api_key",
+    "GEMINI_API_KEY": "@gemini_api_key",
+    "ENTIRE_API_KEY": "@entire_api_key",
+    "FIREBASE_PROJECT_ID": "@firebase_project_id",
+    "FIREBASE_CLIENT_EMAIL": "@firebase_client_email",
+    "FIREBASE_PRIVATE_KEY": "@firebase_private_key"
+  }
+}

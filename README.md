@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# marktron — closed-loop AI visibility agent for early-stage brands.
 
-## Getting Started
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-First, run the development server:
+## Local setup
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+1. Clone repo
+2. `npm install`
+3. Fill `.env.local` (see ENV VARS section below)
+4. Authenticate with Google Cloud: `gcloud auth application-default login --no-launch-browser`
+5. `npm run dev`
+6. Open `http://localhost:3000/api/seed` once to load demo data
+7. Open `/brand/nothing-phone` and click "Run marktron Cycle"
+
+## ENV VARS
+
+```
+PEEC_AI_API_KEY=          # peec.ai dashboard — mock fallback if empty
+TAVILY_API_KEY=           # app.tavily.com — mock fallback if empty
+GEMINI_API_KEY=           # aistudio.google.com — mock fallback if empty
+ENTIRE_API_KEY=           # entire.io dashboard — mock fallback if empty
+FIREBASE_PROJECT_ID=      # your Google Cloud project ID (required)
+FIREBASE_CLIENT_EMAIL=    # leave empty when using ADC (gcloud auth)
+FIREBASE_PRIVATE_KEY=     # leave empty when using ADC (gcloud auth)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+All APIs except Firestore have mock fallbacks — the demo works without real keys.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Uses **Google Cloud Firestore** (Native mode) via the Firebase Admin SDK.
 
-## Learn More
+**Local dev:** authenticates via Application Default Credentials (ADC) — no key file needed:
+```bash
+gcloud auth application-default login --no-launch-browser
+gcloud auth application-default set-quota-project YOUR_PROJECT_ID
+```
 
-To learn more about Next.js, take a look at the following resources:
+**Production (Vercel):** set `FIREBASE_CLIENT_EMAIL` and `FIREBASE_PRIVATE_KEY` from a service account key, or use Workload Identity Federation.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Collections created automatically on first seed:
+- `brands` — tracked brands and their competitors
+- `visibility_snapshots` — Peec AI score snapshots per cycle
+- `competitor_sources` — Tavily results per gap topic
+- `content_drafts` — Gemini-generated content pending approval
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Tech stack
 
-## Deploy on Vercel
+- **Framework:** Next.js (App Router, TypeScript)
+- **Styling:** Tailwind CSS + shadcn/ui
+- **Database:** Google Cloud Firestore (Native mode) via firebase-admin
+- **APIs:**
+  - [Peec AI](https://peec.ai) — brand AI visibility data
+  - [Tavily](https://tavily.com) — competitor source discovery
+  - [Google Gemini](https://aistudio.google.com) (`gemini-2.5-flash`) — content generation
+  - [Entire](https://entire.io) — human-in-the-loop approval
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Demo brands
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Brand | Competitors |
+|-------|------------|
+| Nothing Phone | Apple, Samsung |
+| Attio | Salesforce, HubSpot |
+| BYD | Tesla, Legacy Automakers |
+
+## The loop
+
+```
+measure (Peec) → find (Tavily) → draft (Gemini) → approve (Entire) → re-measure
+```
+
+## Deployment
+
+Deploy to Vercel — set all env vars in Project Settings → Environment Variables.
+
+```bash
+vercel deploy
+```
+
+## MIT License
+
+Copyright 2026 marktron contributors
