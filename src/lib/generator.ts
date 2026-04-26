@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { VertexAI } from '@google-cloud/vertexai'
 
 export interface GeneratedContent {
   title: string
@@ -24,14 +24,11 @@ function mockContent(params: GenerateParams): GeneratedContent {
 }
 
 export async function generateContent(params: GenerateParams): Promise<GeneratedContent> {
-  const apiKey = process.env.GEMINI_API_KEY
-  if (!apiKey) {
-    console.warn('⚠️  GEMINI_API_KEY not set — using mock content')
+  const projectId = process.env.FIREBASE_PROJECT_ID
+  if (!projectId) {
+    console.warn('⚠️  FIREBASE_PROJECT_ID not set — using mock content')
     return mockContent(params)
   }
-
-  const genAI = new GoogleGenerativeAI(apiKey)
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
   const prompt = `You are a brand strategist writing authentic content for early-stage startups to win AI visibility. Content must be genuinely helpful, not promotional. It should position the brand as a credible voice on the topic without sounding like marketing. Respond ONLY with valid JSON.
 
@@ -49,13 +46,16 @@ Generate a ${params.sourceType} response that:
 Return JSON: { "title": string, "body": string, "content_type": string }`
 
   try {
+    const vertexAI = new VertexAI({ project: projectId, location: 'us-central1' })
+    const model = vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+
     const result = await model.generateContent(prompt)
-    const text = result.response.text()
+    const text = result.response.candidates?.[0]?.content?.parts?.[0]?.text ?? ''
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) throw new Error('No JSON in response')
     return JSON.parse(jsonMatch[0]) as GeneratedContent
   } catch (err) {
-    console.warn('⚠️  Gemini API error — using mock content:', err)
+    console.warn('⚠️  Vertex AI error — using mock content:', err)
     return mockContent(params)
   }
 }

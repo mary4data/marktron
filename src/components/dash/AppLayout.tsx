@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { BarChart2, Layers, CheckSquare, TrendingUp, Settings, Menu, Sun, Moon } from 'lucide-react'
+import { BarChart2, Layers, CheckSquare, TrendingUp, Settings, Menu, Sun, Moon, ScanSearch } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 const NAV = [
+  { href: '/dashboard/probe', label: 'GEO Probe', icon: ScanSearch },
   { href: '/dashboard', label: 'Overview', icon: BarChart2 },
   { href: '/dashboard/gaps', label: 'Visibility Gaps', icon: Layers },
   { href: '/dashboard/queue', label: 'Content Queue', icon: CheckSquare },
@@ -16,6 +17,7 @@ const NAV = [
 ]
 
 const PAGE_SUBTITLES: Record<string, string> = {
+  '/dashboard/probe': 'Simulate how ChatGPT and Gemini rank your brand',
   '/dashboard': 'Where you stand vs Salesforce, HubSpot & Pipedrive',
   '/dashboard/gaps': 'Prompts where competitors are winning',
   '/dashboard/queue': 'Content drafted and awaiting approval',

@@ -15,7 +15,7 @@ interface OverviewData {
     overallScore: number | null
   }
   activity: { kind: string; text: string; topic: string | null; tags: string[]; time: string }[]
-  positioning: { brand: string; rank: number; color: string }[]
+  positioning: { brand: string; rank: number; color: string; score: number | null; topGap: { topic: string; gap: number } | null }[]
 }
 
 const KIND_STYLE: Record<string, string> = {
@@ -47,7 +47,6 @@ export default function OverviewPage() {
 
   return (
     <div className="space-y-8">
-      {/* Hero */}
       <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6">
         <h2 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-4">Where You Stand</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -59,31 +58,50 @@ export default function OverviewPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Competitive positioning */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6">
           <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-4">Brand Landscape</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-zinc-200 dark:border-zinc-800">
+            {/* Own brand row */}
+            <div className="flex items-center justify-between py-2.5 border-b border-zinc-200 dark:border-zinc-800">
               <div className="flex items-center gap-3">
-                <span className="w-2 h-2 rounded-full bg-blue-500" />
+                <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
                 <span className="text-sm font-semibold text-zinc-900 dark:text-white">{ownBrand?.name}</span>
                 <span className="text-[10px] bg-blue-500/10 text-blue-500 border border-blue-500/30 px-1.5 py-0.5 rounded font-mono uppercase">your brand</span>
               </div>
-              <span className="text-xs text-zinc-400 font-mono">{ownBrand?.domains?.[0]}</span>
+              <div className="flex items-center gap-4">
+                {stats.overallScore !== null && (
+                  <span className="text-xs font-mono font-semibold text-blue-500">{stats.overallScore}%</span>
+                )}
+                <span className="text-xs text-zinc-400 font-mono">{ownBrand?.domains?.[0]}</span>
+              </div>
             </div>
+            {/* Competitor rows */}
             {positioning.map((p) => (
-              <div key={p.brand} className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
-                  <span className="text-sm text-zinc-700 dark:text-zinc-300">{p.brand}</span>
+              <div key={p.brand} className="py-2.5 border-b border-zinc-100 dark:border-zinc-800/50 last:border-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
+                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{p.brand}</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {p.score !== null && (
+                      <span className="text-xs font-mono font-semibold text-zinc-500">{p.score}%</span>
+                    )}
+                    <span className="text-[10px] font-mono text-zinc-400">competitor</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-400">competitor</span>
+                {p.topGap && (
+                  <div className="ml-5 mt-1 flex items-center gap-1.5">
+                    <span className="text-[10px] font-mono text-amber-500 uppercase">gap</span>
+                    <span className="text-[10px] text-zinc-400 font-mono truncate max-w-[180px]">{p.topGap.topic}</span>
+                    <span className="text-[10px] font-mono text-amber-500 ml-auto">+{p.topGap.gap}pt</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Activity log */}
         <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6">
           <h3 className="text-xs font-mono uppercase tracking-widest text-zinc-500 mb-4">Live Gap Feed</h3>
           <div className="space-y-3">

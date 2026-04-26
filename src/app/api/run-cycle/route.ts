@@ -4,7 +4,6 @@ import { FieldValue } from 'firebase-admin/firestore'
 import { getVisibility, getTopGaps } from '@/lib/peec'
 import { findCompetitorSources } from '@/lib/tavily'
 import { generateContent } from '@/lib/generator'
-import { createApprovalTask } from '@/lib/entire'
 
 export async function POST(req: NextRequest) {
   const db = getDb()
@@ -25,7 +24,7 @@ export async function POST(req: NextRequest) {
   const snapshotRef = db.collection('visibility_snapshots').doc()
   await snapshotRef.set({
     brand_id: brandSlug,
-    snapshot_date: new Date().toISOString().split('T')[0],
+    snapshot_date: new Date().toLocaleDateString('en-CA', { timeZone: 'Europe/Berlin' }),
     overall_score: visibility.overall_score,
     competitor_scores: visibility.competitor_scores,
     gap_topics: visibility.gap_topics,
@@ -78,20 +77,10 @@ export async function POST(req: NextRequest) {
         body: generated.body,
         target_url: topSource.url,
         status: 'pending',
-        entire_task_id: null,
         approved_at: null,
         created_at: FieldValue.serverTimestamp(),
       })
 
-      const approval = await createApprovalTask({
-        title: generated.title,
-        content: generated.body,
-        targetUrl: topSource.url,
-        brandName: brand.name as string,
-        draftId: draftRef.id,
-      })
-
-      await draftRef.update({ entire_task_id: approval.task_id })
       draftsCreated++
     } catch (err) {
       errors.push(`Gap "${gap.topic}": ${String(err)}`)

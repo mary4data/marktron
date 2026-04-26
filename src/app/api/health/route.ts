@@ -15,15 +15,14 @@ export async function GET() {
     result.peec = 'ok'
   } catch {}
 
-  // Gemini
+  // Vertex AI (uses ADC — just check project ID is set)
   try {
-    const key = process.env.GEMINI_API_KEY
-    if (key) {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`,
-        { signal: AbortSignal.timeout(5000) }
-      )
-      if (res.ok) result.gemini = 'ok'
+    const projectId = process.env.FIREBASE_PROJECT_ID
+    if (projectId) {
+      const { VertexAI } = await import('@google-cloud/vertexai')
+      const vertexAI = new VertexAI({ project: projectId, location: 'us-central1' })
+      vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
+      result.gemini = 'ok'
     }
   } catch {}
 

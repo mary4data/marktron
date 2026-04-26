@@ -7,7 +7,7 @@ export async function GET() {
     const { ownBrand, competitors, prompts, topicMap, tagMap } = await getAllPeecData()
 
     const db = getDb()
-    let snapshotData = null
+    let snapshotData: Record<string, unknown> | null = null
     let draftCount = 0
 
     if (db) {
@@ -23,7 +23,19 @@ export async function GET() {
 
     const totalVolume = prompts.reduce((s, p) => s + (p.volume ?? 1), 0)
 
-    // Activity log from real Peec data
+    const competitorScores = (snapshotData?.competitor_scores as Record<string, number>) ?? {}
+    const gapTopics = (snapshotData?.gap_topics as Array<{
+      topic: string; your_score: number; competitor_score: number; gap: number; competitor: string
+    }>) ?? []
+
+    // Best gap per competitor
+    const topGapByCompetitor: Record<string, { topic: string; gap: number }> = {}
+    for (const g of gapTopics) {
+      if (!topGapByCompetitor[g.competitor] || g.gap > topGapByCompetitor[g.competitor].gap) {
+        topGapByCompetitor[g.competitor] = { topic: g.topic, gap: g.gap }
+      }
+    }
+
     const activity = prompts.slice(0, 5).map((p) => ({
       kind: 'gap',
       text: `Gap detected: "${p.messages[0]?.content?.slice(0, 60)}..." (vol: ${p.volume})`,
@@ -32,12 +44,12 @@ export async function GET() {
       time: 'live',
     }))
 
-    // Competitor positioning from real brand data
     const positioning = competitors.map((c, i) => ({
       brand: c.name,
-      domains: c.domains,
       color: c.color,
       rank: i + 2,
+      score: competitorScores[c.name] ?? null,
+      topGap: topGapByCompetitor[c.name] ?? null,
     }))
 
     return NextResponse.json({

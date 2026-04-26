@@ -99,7 +99,7 @@ export async function seed() {
 
   for (const d of draftData) {
     const ref = db.collection('content_drafts').doc()
-    await ref.set({ brand_id: 'nothing-phone', ...d, status: 'pending', entire_task_id: null, approved_at: null, created_at: FieldValue.serverTimestamp() })
+    await ref.set({ brand_id: 'nothing-phone', ...d, status: 'pending', approved_at: null, created_at: FieldValue.serverTimestamp() })
   }
 
   void docToJSON
