@@ -4,10 +4,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { BarChart2, Layers, CheckSquare, TrendingUp, Settings, Menu, Sun, Moon, ScanSearch } from 'lucide-react'
+import { BarChart2, Layers, CheckSquare, TrendingUp, Settings, Menu, Sun, Moon, ScanSearch, FileDown, Send, Bot } from 'lucide-react'
 import { useTheme } from 'next-themes'
 
 const NAV = [
+  { href: '/dashboard/agent', label: 'Agent', icon: Bot },
   { href: '/dashboard/probe', label: 'GEO Probe', icon: ScanSearch },
   { href: '/dashboard/overview', label: 'Overview', icon: BarChart2 },
   { href: '/dashboard/gaps', label: 'Visibility Gaps', icon: Layers },
@@ -17,6 +18,7 @@ const NAV = [
 ]
 
 const PAGE_SUBTITLES: Record<string, string> = {
+  '/dashboard/agent': 'Autonomous cycle — fetches gaps, searches sources, generates drafts',
   '/dashboard/probe': 'Simulate how ChatGPT and Gemini rank your brand',
   '/dashboard/overview': 'Where you stand vs Salesforce, HubSpot & Pipedrive',
   '/dashboard/gaps': 'Prompts where competitors are winning',
@@ -28,27 +30,49 @@ const PAGE_SUBTITLES: Record<string, string> = {
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [running, setRunning] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const [sending, setSending] = useState(false)
   const { theme, setTheme } = useTheme()
 
   const title = NAV.find((n) => n.href === pathname)?.label ?? 'marktron'
   const subtitle = PAGE_SUBTITLES[pathname] ?? ''
 
-  async function runAgent() {
-    setRunning(true)
+  async function downloadReport() {
+    setDownloading(true)
     try {
-      const res = await fetch('/api/run-cycle', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ brandSlug: 'attio' }),
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error ?? 'Cycle failed')
-      toast.success(`Cycle complete — ${data.draftsCreated} drafts created`)
+      const res = await fetch('/api/report')
+      if (!res.ok) throw new Error('Report generation failed')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `visibility-report-${new Date().toISOString().split('T')[0]}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
     } catch (err) {
       toast.error(String(err))
     } finally {
-      setRunning(false)
+      setDownloading(false)
+    }
+  }
+
+  async function sendReport() {
+    const email = prompt('Send report to email:')
+    if (!email) return
+    setSending(true)
+    try {
+      const res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'Send failed')
+      toast.success(`Report sent to ${email}`)
+    } catch (err) {
+      toast.error(String(err))
+    } finally {
+      setSending(false)
     }
   }
 
@@ -146,13 +170,30 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             <button
-              onClick={runAgent}
-              disabled={running}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+              onClick={downloadReport}
+              disabled={downloading}
+              className="p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+              aria-label="Download report"
+              title="Download PDF report"
             >
-              <span>{running ? '⏳' : '▶'}</span>
-              {running ? 'Running...' : 'Run agent now'}
+              <FileDown className="h-4 w-4" />
             </button>
+            <button
+              onClick={sendReport}
+              disabled={sending}
+              className="p-2 rounded-lg text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+              aria-label="Send report by email"
+              title="Send PDF report by email"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+            <Link
+              href="/dashboard/agent"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              <Bot className="h-4 w-4" />
+              Run agent
+            </Link>
           </div>
         </header>
 
