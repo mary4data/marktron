@@ -187,13 +187,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             >
               <Send className="h-4 w-4" />
             </button>
-            <Link
-              href="/dashboard/agent"
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
-            >
-              <Bot className="h-4 w-4" />
-              Run agent
-            </Link>
           </div>
         </header>
 
