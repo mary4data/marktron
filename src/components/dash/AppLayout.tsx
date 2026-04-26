@@ -8,8 +8,8 @@ import { BarChart2, Layers, CheckSquare, TrendingUp, Settings, Menu, Sun, Moon, 
 import { useTheme } from 'next-themes'
 
 const NAV = [
-  { href: '/dashboard/agent', label: 'Agent', icon: Bot },
   { href: '/dashboard/probe', label: 'GEO Probe', icon: ScanSearch },
+  { href: '/dashboard/agent', label: 'Agent', icon: Bot },
   { href: '/dashboard/overview', label: 'Overview', icon: BarChart2 },
   { href: '/dashboard/gaps', label: 'Visibility Gaps', icon: Layers },
   { href: '/dashboard/queue', label: 'Content Queue', icon: CheckSquare },
