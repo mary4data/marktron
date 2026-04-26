@@ -38,7 +38,7 @@ graph TB
 
     subgraph AI["AI Layer"]
         VERTEX["Vertex AI\nGemini 2.5 Flash\n(content generation)"]
-        VERTEX2["Vertex AI\nGemini 2.0 Flash\n(agent function calling)"]
+        VERTEX2["Vertex AI\nGemini 2.5 Flash\n(agent function calling)"]
         OPENAI["OpenAI\ngpt-4o-mini\n(GEO Probe)"]
     end
 
@@ -153,10 +153,9 @@ Same steps without the LLM planning layer — faster, no streaming, used for sch
 |---|---|
 | **Peec AI** | Visibility scores, prompt library, gap analysis |
 | **Vertex AI / Gemini 2.5 Flash** | Content draft generation |
-| **Vertex AI / Gemini 2.0 Flash** | Autonomous agent function calling |
+| **Vertex AI / Gemini 2.5 Flash** | Autonomous agent function calling |
 | **OpenAI GPT-4o mini** | GEO Probe — ChatGPT ranking simulation |
 | **Tavily** | Competitor source search (web crawl + ranking) |
-| **Resend** | Transactional email for PDF report delivery |
 | **@react-pdf/renderer** | Server-side PDF generation |
 
 ### Developer Tooling
