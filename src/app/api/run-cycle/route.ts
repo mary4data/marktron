@@ -5,6 +5,7 @@ import { getVisibility, getTopGaps } from '@/lib/peec'
 import { findCompetitorSources } from '@/lib/tavily'
 import { generateContent } from '@/lib/generator'
 
+
 export async function POST(req: NextRequest) {
   const db = getDb()
   if (!db) return NextResponse.json({ error: 'Firebase not configured' }, { status: 503 })

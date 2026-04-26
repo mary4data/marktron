@@ -9,7 +9,7 @@ import { useTheme } from 'next-themes'
 
 const NAV = [
   { href: '/dashboard/probe', label: 'GEO Probe', icon: ScanSearch },
-  { href: '/dashboard', label: 'Overview', icon: BarChart2 },
+  { href: '/dashboard/overview', label: 'Overview', icon: BarChart2 },
   { href: '/dashboard/gaps', label: 'Visibility Gaps', icon: Layers },
   { href: '/dashboard/queue', label: 'Content Queue', icon: CheckSquare },
   { href: '/dashboard/delta', label: 'Peec Delta', icon: TrendingUp },
@@ -18,7 +18,7 @@ const NAV = [
 
 const PAGE_SUBTITLES: Record<string, string> = {
   '/dashboard/probe': 'Simulate how ChatGPT and Gemini rank your brand',
-  '/dashboard': 'Where you stand vs Salesforce, HubSpot & Pipedrive',
+  '/dashboard/overview': 'Where you stand vs Salesforce, HubSpot & Pipedrive',
   '/dashboard/gaps': 'Prompts where competitors are winning',
   '/dashboard/queue': 'Content drafted and awaiting approval',
   '/dashboard/delta': 'Did the content move the needle? Causation, not correlation.',
