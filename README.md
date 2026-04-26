@@ -305,6 +305,12 @@ src/
 
 ---
 
+## Live Demo
+
+[marktron.lovable.app](https://marktron.lovable.app/) — frontend prototype built with [Lovable](https://lovable.dev)
+
+---
+
 ## Powered by
 
-[Peec AI](https://peec.ai) · [Vertex AI](https://cloud.google.com/vertex-ai) · [Tavily](https://tavily.com) · [Entire](https://entire.io)
+[Peec AI](https://peec.ai) · [Vertex AI](https://cloud.google.com/vertex-ai) · [Tavily](https://tavily.com) · [Entire](https://entire.io) · [Lovable](https://lovable.dev)
